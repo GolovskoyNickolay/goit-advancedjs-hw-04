@@ -1,19 +1,28 @@
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = '?key=49168840-e3c83c6477977e837e7a2b39b';
+import { PX_API_KEY } from "../constants/constants.js";
+import axios from "axios";
 
-export function fetchFotoCard(query) {
-  const searchParams = new URLSearchParams({
-    q: query.trim(),
-    image_type: 'photo',
-    orientation: 'horizontal',
-    safesearch: true,
-  });
+const BASE_URL = "https://pixabay.com/api";
+axios.defaults.baseURL = BASE_URL;
 
-  return fetch(`${BASE_URL}${API_KEY}&${searchParams}`).then(res => {
-    if (!res.ok) {
-      throw new Error(res.status);
+
+export async function getPhotos(query, page) {
+    const params = {
+        key: PX_API_KEY,
+        q: query,
+        image_type: "photo",
+        orientation: "horizontal",
+        safesearch: true,
+        per_page: 15,
+        page
+    };
+
+    try {
+        const response = await axios.get("/", { params });
+        const { hits, totalHits } = response?.data || {};
+
+        return hits ? { photos: hits, isNext: (15 * page) < totalHits } : {};
+    } catch (error) {
+        console.error("Fetch pixabay error: ", error instanceof Error ? error.message : error);
+        return {};
     }
-
-    return res.json();
-  });
 }
