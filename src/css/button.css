@@ -101,6 +101,7 @@
   display: inline-block;
 }
 
+
 button:disabled {
   color: #92978a;
 }
